@@ -7,6 +7,7 @@ import Control.Applicative hiding (optional)
 import Control.Monad
 
 import Types
+import Pretty
 
 header :: Parser (Int, String)
 header = do
@@ -24,5 +25,16 @@ paragraph = manyTill anyChar (try $ string "\n\n")
 htmlParagrah :: Parser HtmlTag
 htmlParagrah = P <$> paragraph
 
+anchor :: Parser (String, String)
+anchor = do
+    link <- between (char '[') (char ']') (many $ noneOf "]")
+    text <- between (char '(') (char ')') (many $ noneOf ")")
+    return (link, text)
+
+htmlAnchor :: Parser HtmlTag
+htmlAnchor = A <$> anchor
+
 htmlTag :: Parser HtmlTag
-htmlTag = htmlHeader <|> htmlParagrah
+htmlTag = htmlHeader <|> htmlAnchor <|> htmlParagrah
+
+
