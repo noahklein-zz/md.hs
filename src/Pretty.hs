@@ -5,12 +5,20 @@ module Pretty
 import Types
 
 pretty :: HtmlTag -> String
-pretty (P s) = wrapInTag "p" s
-pretty (H (n, s)) = wrapInTag ("h" ++ show n) s
+pretty (P s) = tag "p" s
+pretty (H (n, s)) = tag ("h" ++ show n) s
+pretty (A (link, s)) = tagWithAttrs "a" s [("href", link)]
 
-
-wrapInTag :: String -> String -> String
-wrapInTag tag s =
-    "<" ++ tag ++ ">"
+tag :: String -> String -> String
+tag t s =
+    "<" ++ t ++ ">"
         ++ s
-    ++ "</" ++ tag ++ ">"
+    ++ "</" ++ t ++ ">"
+
+tagWithAttrs :: String -> String -> [(String, String)] -> String
+tagWithAttrs t s [] = tag t s
+tagWithAttrs t s attrs =
+    "<" ++ t ++ " " ++ unwords (map sepByEq attrs) ++ ">"
+        ++ s
+    ++ "</" ++ t ++ ">"
+    where sepByEq (attr, val) = attr ++ "='" ++ val ++ "'"
